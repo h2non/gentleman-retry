@@ -3,8 +3,8 @@
 [gentleman](https://github.com/h2non/gentleman)'s plugin providing simple retry policy in your HTTP clients. 
 Retry attempts will happen in case of server or network error.
 
-By default it supports a constant back off retry strategy, but it support custom user defined strategies. 
-Request bodies will be cached in stack in order to re-send them properly.
+By default it supports a constant back off retry strategy, but it also supports user defined retry strategies. 
+Request bodies will be cached in stack in order to re-send them if needed.
 
 Behind the scenes it implements a custom [http.RoundTripper](https://golang.org/pkg/net/http/#RoundTripper) 
 interface which acts like a proxy to `http.Transport`, in order to take full control of the response and retry the request if needed.
