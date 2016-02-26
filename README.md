@@ -1,6 +1,6 @@
 # gentleman-retry [![Build Status](https://travis-ci.org/h2non/gentleman.png)](https://travis-ci.org/h2non/gentleman-retry) [![GoDoc](https://godoc.org/github.com/h2non/gentleman-retry?status.svg)](https://godoc.org/github.com/h2non/gentleman-retry) [![Coverage Status](https://coveralls.io/repos/github/h2non/gentleman-retry/badge.svg?branch=master)](https://coveralls.io/github/h2non/gentleman-retry?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/h2non/gentleman-retry)](https://goreportcard.com/report/github.com/h2non/gentleman-retry)
 
-[gentleman](https://github.com/h2non/gentleman)'s plugin providing simple retry policy in your HTTP clients. 
+[gentleman](https://github.com/h2non/gentleman)'s plugin providing retry policy capabilities to your HTTP clients. 
 Retry attempts will happen in case of server or network error.
 
 By default it supports a constant back off retry strategy, but it also supports user defined retry strategies. 
