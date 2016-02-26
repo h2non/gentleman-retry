@@ -1,0 +1,119 @@
+# gentleman-retry [![Build Status](https://travis-ci.org/h2non/gentleman.png)](https://travis-ci.org/h2non/gentleman-retry) [![GoDoc](https://godoc.org/github.com/h2non/gentleman-retry?status.svg)](https://godoc.org/github.com/h2non/gentleman-retry) [![Coverage Status](https://coveralls.io/repos/github/h2non/gentleman-retry/badge.svg?branch=master)](https://coveralls.io/github/h2non/gentleman-retry?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/h2non/gentleman-retry)](https://goreportcard.com/report/github.com/h2non/gentleman-retry)
+
+[gentleman](https://github.com/h2non/gentleman)'s plugin providing simple retry policy in your HTTP clients. 
+Retry attempts will happen in case of server or network error.
+
+By default it supports a constant back off retry strategy, but it support custom user defined strategies. 
+Request bodies will be cached in stack in order to re-send them properly.
+
+Behind the scenes it implements a custom [http.RoundTripper](https://golang.org/pkg/net/http/#RoundTripper) 
+interface which acts like a proxy to `http.Transport`, in order to take full control of the response and retry the request if needed.
+
+## Installation
+
+```bash
+go get -u gopkg.in/h2non/gentleman-retry.v0
+```
+
+## API
+
+See [godoc reference](https://godoc.org/github.com/h2non/gentleman-retry) for detailed API documentation.
+
+## Examples
+
+#### Default retry strategy
+
+```go
+package main
+
+import (
+  "fmt"
+  "gopkg.in/h2non/gentleman.v0"
+  "gopkg.in/h2non/gentleman-retry.v0"
+)
+
+func main() {
+  // Create a new client
+  cli := gentleman.New()
+
+  // Define base URL
+  cli.URL("http://httpbin.org")
+
+  // Register the retry plugin, using the default retry strategy
+  cli.Use(retry.New(nil))
+
+  // Create a new request based on the current client
+  req := cli.Request()
+
+  // Define the URL path at request level
+  req.Path("/status/503")
+
+  // Set a new header field
+  req.SetHeader("Client", "gentleman")
+
+  // Perform the request
+  res, err := req.Send()
+  if err != nil {
+    fmt.Printf("Request error: %s\n", err)
+    return
+  }
+  if !res.Ok {
+    fmt.Printf("Invalid server response: %d\n", res.StatusCode)
+    return
+  }
+}
+```
+
+#### Exponential retry strategy
+
+I would recommend you using [go-resiliency](https://github.com/eapache/go-resiliency/tree/master/retrier) package for custom retry estrategies:
+```go
+go get -u gopkg.in/eapache/go-resiliency.v1/retrier
+```
+
+```go
+package main
+
+import (
+  "fmt"
+  "gopkg.in/eapache/go-resiliency.v1/retrier"
+  "gopkg.in/h2non/gentleman-retry.v0"
+  "gopkg.in/h2non/gentleman.v0"
+  "time"
+)
+
+func main() {
+  // Create a new client
+  cli := gentleman.New()
+
+  // Define base URL
+  cli.URL("http://httpbin.org")
+
+  // Register the retry plugin, using a custom exponential retry strategy
+  cli.Use(retry.New(retrier.New(retrier.ExponentialBackoff(3, 100*time.Millisecond), nil)))
+
+  // Create a new request based on the current client
+  req := cli.Request()
+
+  // Define the URL path at request level
+  req.Path("/status/503")
+
+  // Set a new header field
+  req.SetHeader("Client", "gentleman")
+
+  // Perform the request
+  res, err := req.Send()
+  if err != nil {
+    fmt.Printf("Request error: %s\n", err)
+    return
+  }
+  if !res.Ok {
+    fmt.Printf("Invalid server response: %d\n", res.StatusCode)
+    return
+  }
+}
+```
+
+## License 
+
+MIT - Tomas Aparicio
