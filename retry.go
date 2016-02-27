@@ -8,7 +8,6 @@ import (
 	"gopkg.in/h2non/gentleman.v0/plugin"
 	"io/ioutil"
 	"net/http"
-	"sync"
 	"time"
 )
 
@@ -61,7 +60,7 @@ func New(retrier Retrier) plugin.Plugin {
 		}
 
 		// Creates the retry transport
-		newTransport := &Transport{retrier, transport, ctx, &sync.Mutex{}}
+		newTransport := &Transport{retrier, transport, ctx}
 		ctx.Client.Transport = newTransport
 
 		h.Next(ctx)
@@ -76,7 +75,6 @@ type Transport struct {
 	retrier   Retrier
 	transport *http.Transport
 	context   *context.Context
-	mutex     *sync.Mutex
 }
 
 // RoundTrip implements the required method by http.RoundTripper interface.
