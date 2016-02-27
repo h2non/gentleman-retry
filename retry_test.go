@@ -21,11 +21,13 @@ func TestRetryRequest(t *testing.T) {
 			w.WriteHeader(http.StatusServiceUnavailable)
 			return
 		}
+		w.Header().Set("foo", r.Header.Get("foo"))
 		fmt.Fprintln(w, "Hello, world")
 	}))
 	defer ts.Close()
 
 	req := gentleman.NewRequest()
+	req.SetHeader("foo", "bar")
 	req.URL(ts.URL)
 	req.Use(New(nil))
 
@@ -33,6 +35,7 @@ func TestRetryRequest(t *testing.T) {
 	st.Expect(t, err, nil)
 	st.Expect(t, res.Ok, true)
 	st.Expect(t, res.StatusCode, 200)
+	st.Expect(t, res.Header.Get("foo"), "bar")
 	st.Expect(t, calls, 3)
 }
 

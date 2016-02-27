@@ -8,6 +8,7 @@ import (
 	"gopkg.in/h2non/gentleman.v0/plugin"
 	"io/ioutil"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -60,7 +61,7 @@ func New(retrier Retrier) plugin.Plugin {
 		}
 
 		// Creates the retry transport
-		newTransport := &Transport{transport, ctx, retrier}
+		newTransport := &Transport{retrier, transport, ctx, &sync.Mutex{}}
 		ctx.Client.Transport = newTransport
 
 		h.Next(ctx)
@@ -72,9 +73,10 @@ func New(retrier Retrier) plugin.Plugin {
 // Transport provides a http.RoundTripper compatible transport who encapsulates
 // the original http.Transport and provides transparent retry support.
 type Transport struct {
+	retrier   Retrier
 	transport *http.Transport
 	context   *context.Context
-	retrier   Retrier
+	mutex     *sync.Mutex
 }
 
 // RoundTrip implements the required method by http.RoundTripper interface.
@@ -85,16 +87,21 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Cache all the body buffer
 	buf, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		return t.context.Response, err
+		return res, err
 	}
 	req.Body.Close()
 
+	// Transport request via retrier
 	t.retrier.Run(func() error {
+		// Clone the http.Request for side effects free
+		reqCopy := &http.Request{}
+		*reqCopy = *req
+
 		// Restore the cached body buffer
-		req.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
+		reqCopy.Body = ioutil.NopCloser(bytes.NewBuffer(buf))
 
 		// Proxy to the original tranport round tripper
-		res, err = t.transport.RoundTrip(req)
+		res, err = t.transport.RoundTrip(reqCopy)
 		if err != nil {
 			return err
 		}
