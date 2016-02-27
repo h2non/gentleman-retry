@@ -80,6 +80,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 	if err != nil {
 		return res, err
 	}
+	req.Body.Close()
 
 	t.retrier.Run(func() error {
 		// Restore the cached body buffer
