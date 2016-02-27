@@ -99,7 +99,7 @@ func TestRetryNetworkError(t *testing.T) {
 }
 
 // Timeout retry is not fully supported yet
-func TestRetryNetworkTimeout(t *testing.T) {
+func testRetryNetworkTimeout(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		time.Sleep(1 * time.Second)
 		w.WriteHeader(200)
