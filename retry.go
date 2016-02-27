@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	// RetryTimes defines the default max amount of times to retry a request.
 	RetryTimes = 3
 
@@ -27,6 +27,14 @@ var (
 	ErrTransport = errors.New("retry: cannot use plugin with a custom http transport")
 )
 
+var (
+	// ConstantBackoff provides a built-in retry strategy based on constant back off.
+	ConstantBackoff = retry.New(retry.ConstantBackoff(RetryTimes, RetryWait), nil)
+
+	// ExponentialBackoff provides a built-int retry strategy based on exponential back off.
+	ExponentialBackoff = retry.New(retry.ExponentialBackoff(RetryTimes, RetryWait), nil)
+)
+
 // Retrier defines the required interface implemented by retry strategies.
 type Retrier interface {
 	Run(func() error) error
@@ -35,7 +43,7 @@ type Retrier interface {
 // New creates a new retry plugin based on the given retry strategy.
 func New(retrier Retrier) plugin.Plugin {
 	if retrier == nil {
-		retrier = retry.New(retry.ConstantBackoff(RetryTimes, RetryWait), nil)
+		retrier = ConstantBackoff
 	}
 
 	// Create retry new plugin
@@ -72,13 +80,12 @@ type Transport struct {
 // RoundTrip implements the required method by http.RoundTripper interface.
 // Performs the network transport over the original http.Transport but providing retry support.
 func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
-	var err error
-	var res *http.Response
+	res := t.context.Response
 
 	// Cache all the body buffer
 	buf, err := ioutil.ReadAll(req.Body)
 	if err != nil {
-		return res, err
+		return t.context.Response, err
 	}
 	req.Body.Close()
 

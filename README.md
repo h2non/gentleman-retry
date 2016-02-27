@@ -39,8 +39,8 @@ func main() {
   // Define base URL
   cli.URL("http://httpbin.org")
 
-  // Register the retry plugin, using the default retry strategy
-  cli.Use(retry.New(nil))
+  // Register the retry plugin, using the built-in constant back off strategy
+  cli.Use(retry.New(retry.ConstantBackoff))
 
   // Create a new request based on the current client
   req := cli.Request()
