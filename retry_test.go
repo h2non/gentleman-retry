@@ -97,14 +97,8 @@ func TestRetryNetworkError(t *testing.T) {
 
 // Timeout retry is not fully supported yet
 func TestRetryNetworkTimeout(t *testing.T) {
-	calls := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		calls++
-		if calls < 3 {
-			time.Sleep(1 * time.Second)
-			w.WriteHeader(200)
-			return
-		}
+		time.Sleep(1 * time.Second)
 		w.WriteHeader(200)
 	}))
 	defer ts.Close()
@@ -119,5 +113,4 @@ func TestRetryNetworkTimeout(t *testing.T) {
 	st.Expect(t, strings.Contains(err.Error(), "request canceled"), true)
 	st.Expect(t, res.Ok, false)
 	st.Expect(t, res.StatusCode, 0)
-	st.Expect(t, calls, 1)
 }
