@@ -51,22 +51,32 @@ func New(retrier Retrier) plugin.Plugin {
 
 	// Attach the middleware handler for before dial phase
 	plu.SetHandler("before dial", func(ctx *context.Context, h context.Handler) {
-		// Assert http.Transport to work with the instance
-		transport, ok := ctx.Client.Transport.(*http.Transport)
-		if !ok {
+		err := InterceptTransport(ctx, retrier)
+		if err != nil {
 			// If using custom transport, fail with an error for now
 			h.Error(ctx, ErrTransport)
 			return
 		}
-
-		// Creates the retry transport
-		newTransport := &Transport{retrier, transport, ctx}
-		ctx.Client.Transport = newTransport
-
 		h.Next(ctx)
 	})
 
 	return plu
+}
+
+// InterceptTransport is a middleware function handler that intercepts
+// the HTTP transport based on the given HTTP retrier and context.
+func InterceptTransport(ctx *context.Context, retrier Retrier) error {
+	// Assert http.Transport to work with the instance
+	transport, ok := ctx.Client.Transport.(*http.Transport)
+	if !ok {
+		// If using custom transport, fail with an error for now
+		return ErrTransport
+	}
+
+	// Creates the retry transport
+	newTransport := &Transport{retrier, transport, ctx}
+	ctx.Client.Transport = newTransport
+	return nil
 }
 
 // Transport provides a http.RoundTripper compatible transport who encapsulates
