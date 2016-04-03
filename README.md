@@ -1,9 +1,8 @@
 # [gentleman](https://github.com/h2non/gentleman)-retry [![Build Status](https://travis-ci.org/h2non/gentleman.png)](https://travis-ci.org/h2non/gentleman-retry) [![GoDoc](https://godoc.org/github.com/h2non/gentleman-retry?status.svg)](https://godoc.org/github.com/h2non/gentleman-retry) [![Coverage Status](https://coveralls.io/repos/github/h2non/gentleman-retry/badge.svg?branch=master)](https://coveralls.io/github/h2non/gentleman-retry?branch=master) [![Go Report Card](https://goreportcard.com/badge/github.com/h2non/gentleman-retry)](https://goreportcard.com/report/github.com/h2non/gentleman-retry)
 
 [gentleman](https://github.com/h2non/gentleman)'s plugin providing retry policy capabilities to your HTTP clients. 
-Retry attempts will happen in case of server or network error.
 
-Constant backoff strategy will be used by default, but you use custom retry strategies with different behaviors. 
+Constant backoff strategy will be used by default with a maximum of 3 attempts, but you use a custom or third-party retry strategies. 
 Request bodies will be cached in the stack in order to re-send them if needed.
 
 By default, retry will happen in case of error or server response error (>= 500). 
