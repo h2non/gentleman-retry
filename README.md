@@ -3,7 +3,7 @@
 [gentleman](https://github.com/h2non/gentleman)'s plugin providing retry policy capabilities to your HTTP clients. 
 Retry attempts will happen in case of server or network error.
 
-By default it supports a constant back off retry strategy, but it also supports user defined retry strategies. 
+Constant backoff strategy will be used by default, but you use custom retry strategies with different behaviors. 
 Request bodies will be cached in the stack in order to re-send them if needed.
 
 By default, retry will happen in case of error or server response error (>= 500). 
