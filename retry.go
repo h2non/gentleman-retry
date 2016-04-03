@@ -21,7 +21,7 @@ const (
 
 var (
 	// ErrServer stores the error when a server error happens.
-	ErrServer = errors.New("retry: server error")
+	ErrServer = errors.New("retry: server response error")
 )
 
 var (
@@ -35,6 +35,25 @@ var (
 // Retrier defines the required interface implemented by retry strategies.
 type Retrier interface {
 	Run(func() error) error
+}
+
+// EvalFunc represents the function interface for failed request evaluator.
+type EvalFunc func(error, *http.Response, *http.Request) error
+
+// Evaluator determines when a request failed in order to retry it,
+// evaluating the error, response and optionally the original request.
+//
+// By default if will retry if an error is present or response status code is >= 500.
+//
+// You can override this function to use a custom evaluator function with additional logic.
+var Evaluator = func(err error, res *http.Response, req *http.Request) error {
+	if err != nil {
+		return err
+	}
+	if res.StatusCode >= 500 {
+		return ErrServer
+	}
+	return nil
 }
 
 // New creates a new retry plugin based on the given retry strategy.
@@ -58,7 +77,7 @@ func New(retrier Retrier) plugin.Plugin {
 // InterceptTransport is a middleware function handler that intercepts
 // the HTTP transport based on the given HTTP retrier and context.
 func InterceptTransport(ctx *context.Context, retrier Retrier) error {
-	newTransport := &Transport{retrier, ctx.Client.Transport, ctx}
+	newTransport := &Transport{retrier, Evaluator, ctx.Client.Transport, ctx}
 	ctx.Client.Transport = newTransport
 	return nil
 }
@@ -67,6 +86,7 @@ func InterceptTransport(ctx *context.Context, retrier Retrier) error {
 // the original http.Transport and provides transparent retry support.
 type Transport struct {
 	retrier   Retrier
+	evaluator EvalFunc
 	transport http.RoundTripper
 	context   *context.Context
 }
@@ -94,14 +114,7 @@ func (t *Transport) RoundTrip(req *http.Request) (*http.Response, error) {
 
 		// Proxy to the original tranport round tripper
 		res, err = t.transport.RoundTrip(reqCopy)
-		if err != nil {
-			return err
-		}
-		if res.StatusCode >= 500 {
-			return ErrServer
-		}
-
-		return nil
+		return t.evaluator(err, res, req)
 	})
 
 	// Restore original http.Transport
