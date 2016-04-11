@@ -50,7 +50,7 @@ var Evaluator = func(err error, res *http.Response, req *http.Request) error {
 	if err != nil {
 		return err
 	}
-	if res.StatusCode >= 500 {
+	if res.StatusCode >= 500 || res.StatusCode == 429 {
 		return ErrServer
 	}
 	return nil
