@@ -5,7 +5,7 @@
 Constant backoff strategy will be used by default with a maximum of 3 attempts, but you use a custom or third-party retry strategies. 
 Request bodies will be cached in the stack in order to re-send them if needed.
 
-By default, retry will happen in case of error or server response error (>= 500). 
+By default, retry will happen in case of network error or server response error (>= 500 || = 429). 
 You can use a custom `Evaluator` function to determine with custom logic when should retry or not.
 
 Behind the scenes it implements a custom [http.RoundTripper](https://golang.org/pkg/net/http/#RoundTripper) 
