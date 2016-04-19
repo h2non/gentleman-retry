@@ -3,8 +3,8 @@ package retry
 import (
 	"fmt"
 	"github.com/nbio/st"
-	"gopkg.in/h2non/gentleman.v0"
-	"gopkg.in/h2non/gentleman.v0/plugins/timeout"
+	"gopkg.in/h2non/gentleman.v1"
+	"gopkg.in/h2non/gentleman.v1/plugins/timeout"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
