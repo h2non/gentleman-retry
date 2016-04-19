@@ -2,15 +2,16 @@ package retry
 
 import (
 	"fmt"
-	"github.com/nbio/st"
-	"gopkg.in/h2non/gentleman.v1"
-	"gopkg.in/h2non/gentleman.v1/plugins/timeout"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/nbio/st"
+	"gopkg.in/h2non/gentleman.v1"
+	"gopkg.in/h2non/gentleman.v1/plugins/timeout"
 )
 
 func TestRetryRequest(t *testing.T) {

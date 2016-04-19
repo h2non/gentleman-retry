@@ -14,7 +14,7 @@ interface which acts like a proxy to `http.Transport`, in order to take full con
 ## Installation
 
 ```bash
-go get -u gopkg.in/h2non/gentleman-retry.v0
+go get -u gopkg.in/h2non/gentleman-retry.v1
 ```
 
 ## API
@@ -30,8 +30,8 @@ package main
 
 import (
   "fmt"
-  "gopkg.in/h2non/gentleman.v0"
-  "gopkg.in/h2non/gentleman-retry.v0"
+  "gopkg.in/h2non/gentleman.v1"
+  "gopkg.in/h2non/gentleman-retry.v1"
 )
 
 func main() {
@@ -79,8 +79,8 @@ package main
 import (
   "fmt"
   "gopkg.in/eapache/go-resiliency.v1/retrier"
-  "gopkg.in/h2non/gentleman-retry.v0"
-  "gopkg.in/h2non/gentleman.v0"
+  "gopkg.in/h2non/gentleman-retry.v1"
+  "gopkg.in/h2non/gentleman.v1"
   "time"
 )
 

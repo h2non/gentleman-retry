@@ -3,12 +3,13 @@ package retry
 import (
 	"bytes"
 	"errors"
-	retry "gopkg.in/eapache/go-resiliency.v1/retrier"
-	"gopkg.in/h2non/gentleman.v1/context"
-	"gopkg.in/h2non/gentleman.v1/plugin"
 	"io/ioutil"
 	"net/http"
 	"time"
+
+	retry "gopkg.in/eapache/go-resiliency.v1/retrier"
+	"gopkg.in/h2non/gentleman.v1/context"
+	"gopkg.in/h2non/gentleman.v1/plugin"
 )
 
 const (
