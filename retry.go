@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"time"
 
+	"gopkg.in/h2non/gentleman.v2/context"
+	"gopkg.in/h2non/gentleman.v2/plugin"
 	retry "gopkg.in/eapache/go-resiliency.v1/retrier"
-	"gopkg.in/h2non/gentleman.v1/context"
-	"gopkg.in/h2non/gentleman.v1/plugin"
 )
 
 const (
