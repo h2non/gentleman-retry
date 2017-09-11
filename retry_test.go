@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"github.com/nbio/st"
-	"gopkg.in/h2non/gentleman.v1/plugins/timeout"
 	"gopkg.in/h2non/gentleman.v2"
+	"gopkg.in/h2non/gentleman.v2/plugins/timeout"
 )
 
 func TestRetryRequest(t *testing.T) {
